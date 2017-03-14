@@ -14,8 +14,7 @@ typedef struct _scaleroute
   char strs[MAXPDSTRING];
   int pcs[12];
   int root;
-  int max_outlet;
-  t_outlet *outlet[4];
+  t_outlet *outlet[2];
 } t_scaleroute;
 
 void scaleroute_float(t_scaleroute *x, t_floatarg f)
@@ -23,7 +22,8 @@ void scaleroute_float(t_scaleroute *x, t_floatarg f)
   int index = ((int)f + 12 - x->root) % 12;
   if(index < 12 && index > -1)
     {
-      outlet_float(x->outlet[x->pcs[index]], f);
+      outlet_float(x->outlet[0], f);
+      outlet_float(x->outlet[1], x->pcs[index]);
     }  
   else
     error("Invalid input");
@@ -159,18 +159,19 @@ void *scaleroute_new(t_atom *s, int argc, t_atom *argv)
   x->pcs[9] = 1;
   x->pcs[10] = 2;
   x->pcs[11] = 3;
-  for(int i = 0; i < 4; i++)
-    {
-      x->outlet[i] = outlet_new(&x->fte, &s_float);
-    }
+  x->outlet[0] = outlet_new(&x->fte, &s_float);
+  x->outlet[1] = outlet_new(&x->fte, &s_float);
   return (void *)x;
 }
 
 void scaleroute_setup(void)
 {
-  scaleroute_class = class_new(gensym("scaleroute"), (t_newmethod)scaleroute_new, 0, 
-			  sizeof(t_scaleroute), CLASS_DEFAULT, A_GIMME, 0);
+  scaleroute_class = class_new(gensym("scaleroute"), 
+			       (t_newmethod)scaleroute_new, 0,
+			       sizeof(t_scaleroute), CLASS_DEFAULT, A_GIMME, 
+			       0);
   class_addfloat(scaleroute_class, scaleroute_float);
-  class_addmethod(scaleroute_class, scaleroute_update, gensym("root"), A_GIMME, 0);
+  class_addmethod(scaleroute_class, scaleroute_update, gensym("root"), 
+		  A_GIMME, 0);
   post(version);
 }

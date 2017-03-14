@@ -1,23 +1,21 @@
 #N canvas 341 413 660 222 10;
 #X floatatom 12 44 5 0 0 0 - - -;
-#X floatatom 42 44 5 0 0 0 - - -;
-#X floatatom 73 44 5 0 0 0 - - -;
-#X floatatom 104 44 5 0 0 0 - - -;
+#X floatatom 69 44 5 0 0 0 - - -;
 #X floatatom 12 10 5 0 0 0 - - -;
-#X msg 192 10 root C#;
-#X msg 143 10 root C;
+#X msg 132 10 root C#;
+#X msg 83 10 root C;
+#X obj 12 27 scaleroute;
 #X text 281 6 [scaleroute] for Pd by Brian Voyer <brianvoyer@gmail.com>
 Route pitch data based on pitch class (PC) and root. 0 corresponds
 to the root specified (defaults to C) \, 1 corresponds to a semitone
-above the root \, and so on. Perfect intervals go to the first outlet
-\, imperfect consonances go to the second outlet \, soft dissonances
-go to the third outlet \, and sharp dissonances go the fourth outlet.
-;
-#X obj 12 27 scaleroute;
-#X connect 4 0 8 0;
-#X connect 5 0 8 0;
-#X connect 6 0 8 0;
-#X connect 8 0 0 0;
-#X connect 8 1 1 0;
-#X connect 8 2 2 0;
-#X connect 8 3 3 0;
+above the root \, and so on. Outputs the MIDI pitch (outlet 1) and
+the type of interval (outlet 2) above the root. Perfect intervals:
+0 \, imperfect consonances: 1 \, soft dissonances: 2 \, and sharp dissonances:
+3;
+#X msg 185 10 root Fb;
+#X connect 2 0 5 0;
+#X connect 3 0 5 0;
+#X connect 4 0 5 0;
+#X connect 5 0 0 0;
+#X connect 5 1 1 0;
+#X connect 7 0 5 0;

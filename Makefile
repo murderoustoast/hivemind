@@ -1,4 +1,4 @@
-LIBRARY_NAME = libcrystal
+LIBRARY_NAME = hivemind
 
 # make darwin moves all the .pd_darwin files into a subdirectory
 
