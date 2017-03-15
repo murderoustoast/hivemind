@@ -1,10 +1,7 @@
 /* [scaleroute]: an external for organizing pitch data based on pitch sets.
  * see the help file
  */
-#include "m_pd.h"
 #include <string.h>
-
-static char *version = "[]";
 
 static t_class *scaleroute_class;
 
@@ -173,5 +170,4 @@ void scaleroute_setup(void)
   class_addfloat(scaleroute_class, scaleroute_float);
   class_addmethod(scaleroute_class, scaleroute_update, gensym("root"), 
 		  A_GIMME, 0);
-  post(version);
 }
