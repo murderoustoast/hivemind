@@ -1,0 +1,182 @@
+//
+//  pannum11~.c
+//  pannum11~
+//
+//  Created by Class2017 on 3/15/17.
+//  Copyright (c) 2017 Class2017. All rights reserved.
+//
+
+
+/* PREPROCESSOR */
+
+#include "stdio.h"
+#include "m_pd.h"
+#include "math.h"
+
+
+/* POINTER TO CLASS */
+
+static t_class *pannum11_tilde_class;
+
+
+/* STRUCTURE */
+
+typedef struct _pannum11_tilde
+{
+    t_object x_obj;
+    t_sample pannum;
+    t_sample f;
+    
+    t_inlet *x_in2;
+    t_outlet *x_out1;
+    t_outlet *x_out2;
+    
+} t_pannum11_tilde;
+
+
+/* PERFORM ROUTINE */
+
+t_int *pannum11_tilde_perform(t_int *w)
+{
+    t_pannum11_tilde *x = (t_pannum11_tilde *)(w[1]);
+    t_sample *in1 = (t_sample *)(w[2]);
+    t_sample *in2 = (t_sample *)(w[3]);
+    t_sample *out1 = (t_sample *)(w[4]);
+    t_sample *out2 = (t_sample *)(w[5]);
+    
+    int n = (int)(w[6]);
+    
+    t_sample f_pan = (x->pannum<1)?1.0:(x->pannum>11)?11.0:x->pannum;
+    t_sample in, pannum;
+    in = *in1++;
+    pannum = *in2;
+    
+// This time around the values have been changed to reflect the literal scale number, from 0-11.
+// All that would be necessary to make this work is to change the output values in [scaleroute]
+// to the actual number of half steps up the scale we have gone. Now there are more specific
+// locations based on more precise scale degrees, rather than splitting it up into four previously.
+    
+    while (n--)
+    {
+        if(pannum == 0)
+        {
+            (*out1++) = in;
+            (*out2++) = in;
+        }
+        if(pannum == 1)
+        {
+            (*out1++) = in * .5;
+            (*out2++) = in * 0;
+        }
+        if(pannum == 2)
+        {
+            (*out1++) = in * .75;
+            (*out2++) = in * .25;
+        }
+        if(pannum == 3)
+        {
+            (*out1++) = in * .75;
+            (*out2++) = in * .5;
+        }
+        if(pannum == 4)
+        {
+            (*out1++) = in * .75;
+            (*out2++) = in * .65;
+        }
+        if(pannum == 5)
+        {
+            (*out1++) = in * .5;
+            (*out2++) = in * 0;
+        }
+        if(pannum == 6)
+        {
+            (*out1++) = in * 0;
+            (*out2++) = in * .5;
+        }
+        if(pannum == 7)
+        {
+            (*out1++) = in * .25;
+            (*out2++) = in * .25;
+        }
+        if(pannum == 8)
+        {
+            (*out1++) = in * .5;
+            (*out2++) = in * .75;
+        }
+        if(pannum == 9)
+        {
+            (*out1++) = in * .65;
+            (*out2++) = in * .75;
+        }
+        if(pannum == 10)
+        {
+            (*out1++) = in * .25;
+            (*out2++) = in * .75;
+        }
+        if(pannum == 11)
+        {
+            (*out1++) = in * .25;
+            (*out2++) = in * .25;
+        }
+    }
+    
+    return (w+6);
+}
+
+
+/* DSP ROUTINE */
+
+void pannum11_tilde_dsp (t_pannum11_tilde *x, t_signal **sp)
+{
+    dsp_add(pannum11_tilde_perform,
+            6,
+            x,
+            sp[0]->s_vec,
+            sp[1]->s_vec,
+            sp[2]->s_vec,
+            sp[0]->s_n);
+}
+
+
+/* DESTRUCTOR */
+
+void pannum11_tilde_free(t_pannum11_tilde *x)
+{
+    inlet_free(x->x_in2);
+    outlet_free(x->x_out1);
+    outlet_free(x->x_out2);
+}
+
+
+/* CONSTRUCTOR */
+
+void *pannum11_tilde_new(t_floatarg f)
+{
+    t_pannum11_tilde *x = (t_pannum11_tilde *)pd_new(pannum11_tilde_class);
+    x->pannum = f;
+    x->x_in2 = inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("symbol"), gensym("symbol"));
+    x->x_out1 = outlet_new(&x->x_obj, &s_signal);
+    x->x_out2 = outlet_new(&x->x_obj, &s_signal);
+    
+    return (void *)x;
+}
+
+
+/* SETUP */
+
+void pannum11_tilde_setup(void)
+{
+    pannum11_tilde_class = class_new(gensym("pannum11~"),
+                                   (t_newmethod)pannum11_tilde_new,
+                                   0,
+                                   sizeof(t_pannum11_tilde),
+                                   CLASS_DEFAULT,
+                                   A_DEFFLOAT,
+                                   0);
+    class_addmethod(pannum11_tilde_class,
+                    (t_method)pannum11_tilde_dsp,
+                    gensym("dsp"),
+                    0);
+    CLASS_MAINSIGNALIN(pannum11_tilde_class, t_pannum11_tilde, f);
+    class_sethelpsymbol(pannum11_tilde_class, gensym("pannum11~"));
+}
